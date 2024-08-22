@@ -1,8 +1,6 @@
 package maritza.ifpr;
 
-
 import java.util.ArrayList;
-
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -12,10 +10,8 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-//vou fazer ainda
-/**
- * JavaFX App
- */
+
+
 public class App extends Application {
 
     private ControladorQuiz controladorQuiz;
@@ -83,7 +79,7 @@ public class App extends Application {
         root.getChildren().add(enunciado);
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10.0);
-
+        
         root.getChildren().add(alternativa1);
         root.getChildren().add(alternativa2);
         root.getChildren().add(alternativa3);

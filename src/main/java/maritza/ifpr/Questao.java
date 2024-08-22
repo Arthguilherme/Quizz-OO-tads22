@@ -15,6 +15,7 @@ public class Questao {
         this.respostaCorreta = respostaCorreta;
         this.outrasAlternativas = outrasAlternativas;
         this.todasAlternativas = new ArrayList<>();
+        
         for(String alternativa:outrasAlternativas){
             todasAlternativas.add(alternativa);
         }

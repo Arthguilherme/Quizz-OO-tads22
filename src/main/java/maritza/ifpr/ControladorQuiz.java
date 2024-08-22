@@ -11,6 +11,7 @@ public class ControladorQuiz {
     private int erros;
 
     public ControladorQuiz(ArrayList<Questao> questoes) {
+       
         this.questoes = questoes;
         reiniciar();
     }
