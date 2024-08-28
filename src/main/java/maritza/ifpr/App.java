@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
@@ -51,6 +52,11 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+   
+        // FXMLLoader FXMLLoader= new FXMLLoader(getClass().getResource("layout.fxml"));
+       
+        // Parent root = FXMLLoader.load();
+       // Scene scene = new Scene(root,400,600);
 
         inicializaComponentes();
         atualizaComponentes();
@@ -58,8 +64,8 @@ public class App extends Application {
         cena = new Scene(root, 700, 500);
         cena.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
-        stage.setScene(cena);
-        stage.show();
+         stage.setScene(cena);
+         stage.show();
 
     }
 
