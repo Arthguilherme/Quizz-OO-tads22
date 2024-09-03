@@ -1,6 +1,12 @@
 package maritza.ifpr;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -11,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 
 public class App extends Application {
 
@@ -31,32 +36,60 @@ public class App extends Application {
 
     @Override
     public void init() throws Exception {
-        super.init();
-
         ArrayList<Questao> lista = new ArrayList<>();
+        File file = new File("Perguntas.txt");
 
-        lista.add(new Questao("Qual é o nome do poder da zanpakutou de Barragan Luisenbarn, que manipula a idade? ", "Resupira",
-                new String[] { "Toque da Morte", "Envelheça", "Fogo da Morte", "年をとる" }));
-        lista.add(new Questao("Qual é o nome da mãe do Ichigo?", "Masaki",
-                new String[] { "Kanae", "Tatsuki", "Rangiku", "Mashiro" }));
-        lista.add(new Questao("De quem pertence a Zampakutou Ryumon Hakaue? ", "Kensei Muguruma",
-                new String[] { "Mashiro Kuma", "Lisa Yadomaru", "Rjuro Otoribashi", "Sentaro Kotsubaki" }));
-        lista.add(new Questao("Qual é o nome do grupo de elite entre os Quincy, liderado por Yhwach, que serve como sua guarda pessoal??", "Sternritter",
-                new String[] { "Schwertritter", "Eisenritter", "Heilritter", "Ritterstern" }));
-        lista.add(new Questao("Qual é o nome do artefato que divide a Soul Society da Terra?", "Oken",
-                new String[] { "Korin", "Hogyoku", "Ginto", "Kinki no Sho" }));
+        if (file.exists()) {
+            try {
+                List<String> listaTexto = Files.readAllLines(file.toPath(), Charset.defaultCharset());
+
+                if (!listaTexto.isEmpty()) {
+                    for (String linha : listaTexto) {
+                        String[] partes = linha.split("\\|");
+                        if (partes.length >= 3) {
+                            String enunciado = partes[0];
+                            String respostaCorreta = partes[1];
+                            String[] alternativas = new String[partes.length - 2];
+                            System.arraycopy(partes, 2, alternativas, 0, alternativas.length);
+
+                            Questao questao = new Questao(enunciado, respostaCorreta, alternativas);
+                            lista.add(questao);
+                        }
+                    }
+                } else {
+                    lista.add(new Questao(
+                            "Qual é o nome do poder da zanpakutou de Barragan Luisenbarn, que manipula a idade? ",
+                            "Resupira",
+                            new String[] { "Toque da Morte", "Envelheça", "Fogo da Morte", "年をとる" }));
+                    lista.add(new Questao("Qual é o nome da mãe do Ichigo?", "Masaki",
+                            new String[] { "Kanae", "Tatsuki", "Rangiku", "Mashiro" }));
+                    lista.add(new Questao("De quem pertence a Zampakutou Ryumon Hakaue? ", "Kensei Muguruma",
+                            new String[] { "Mashiro Kuma", "Lisa Yadomaru", "Rjuro Otoribashi", "Sentaro Kotsubaki" }));
+                    lista.add(new Questao(
+                            "Qual é o nome do grupo de elite entre os Quincy, liderado por Yhwach, que serve como sua guarda pessoal??",
+                            "Sternritter",
+                            new String[] { "Schwertritter", "Eisenritter", "Heilritter", "Ritterstern" }));
+                    lista.add(new Questao("Qual é o nome do artefato que divide a Soul Society da Terra?", "Oken",
+                            new String[] { "Korin", "Hogyoku", "Ginto", "Kinki no Sho" }));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Arquivo não encontrado");
+        }
 
         controladorQuiz = new ControladorQuiz(lista);
-
+        controladorQuiz.reiniciar();
     }
 
     @Override
     public void start(Stage stage) throws Exception {
-   
+
         // FXMLLoader FXMLLoader= new FXMLLoader(getClass().getResource("layout.fxml"));
-       
+
         // Parent root = FXMLLoader.load();
-       // Scene scene = new Scene(root,400,600);
+        // Scene scene = new Scene(root,400,600);
 
         inicializaComponentes();
         atualizaComponentes();
@@ -64,8 +97,8 @@ public class App extends Application {
         cena = new Scene(root, 700, 500);
         cena.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
-         stage.setScene(cena);
-         stage.show();
+        stage.setScene(cena);
+        stage.show();
 
     }
 
@@ -85,7 +118,7 @@ public class App extends Application {
         root.getChildren().add(enunciado);
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10.0);
-        
+
         root.getChildren().add(alternativa1);
         root.getChildren().add(alternativa2);
         root.getChildren().add(alternativa3);
@@ -135,7 +168,6 @@ public class App extends Application {
 
     }
 
-    
     private EventHandler respondeQuestao() {
         return new EventHandler<Event>() {
             @Override
@@ -148,7 +180,7 @@ public class App extends Application {
                 if (result) {
                     resultado.setText("uhull!! Acertou");
 
-                }else{
+                } else {
                     resultado.setText("Que pena!! você errou");
                 }
                 resultado.setVisible(true);
@@ -167,7 +199,7 @@ public class App extends Application {
         return new EventHandler<Event>() {
             @Override
             public void handle(Event event) {
-               
+
                 alternativa1.setDisable(false);
                 alternativa2.setDisable(false);
                 alternativa3.setDisable(false);
@@ -177,8 +209,7 @@ public class App extends Application {
                 if (controladorQuiz.temProximaQuestao()) {
                     controladorQuiz.proximaQuestao();
                     atualizaComponentes();
-                }
-                else{
+                } else {
                     enunciado.setVisible(false);
                     alternativa1.setVisible(false);
                     alternativa2.setVisible(false);
@@ -187,7 +218,8 @@ public class App extends Application {
                     alternativa5.setVisible(false);
                     reiniciar.setVisible(true);
                     proxima.setVisible(false);
-                    resultado.setText("Acertos: "+controladorQuiz.getAcertos()+"\nErros: "+controladorQuiz.getErros());
+                    resultado.setText(
+                            "Acertos: " + controladorQuiz.getAcertos() + "\nErros: " + controladorQuiz.getErros());
                     return;
                 }
 
@@ -198,10 +230,10 @@ public class App extends Application {
         };
     }
 
-    private EventHandler reiniciaQuiz(){
-        return new EventHandler<Event>(){
+    private EventHandler reiniciaQuiz() {
+        return new EventHandler<Event>() {
             @Override
-            public void handle(Event event){
+            public void handle(Event event) {
                 enunciado.setVisible(true);
                 alternativa1.setVisible(true);
                 alternativa2.setVisible(true);

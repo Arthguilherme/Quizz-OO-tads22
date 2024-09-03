@@ -5,10 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-public class AppFile {
+public class AppFile{
     public static void main(String[] args) {
         Scanner ler = new Scanner(System.in);
         String pergunta = "";
@@ -24,6 +28,7 @@ public class AppFile {
 
         System.out.println("Quantas perguntas voce quer fazer?");
         qtdePerguntas = ler.nextInt();
+        ler.nextLine(); 
 
         while (qtdePerguntas > 0) {
 
@@ -46,7 +51,7 @@ public class AppFile {
             qtdePerguntas--;
             System.out.println("passou aqui");
         }
-         
+
         // System.out.println("Essas sao as respostas: ");
         // System.out.printf("%s ",respostaCorreta);
         // System.out.printf("\n%s ",respostaErrada1);
@@ -54,31 +59,45 @@ public class AppFile {
         // System.out.printf("\n%s ",respostaErrada3);
         // System.out.printf("\n%s ",respostaErrada4);
 
-        try (FileWriter writer = new FileWriter("Perguntas.txt", true)) { // 'true' para adicionar ao final do arquivo,
-                                                                          // não sobrescrever
-            writer.write("Pergunta: " + pergunta + "\n");
-            writer.write(" " + respostaCorreta + "\n");
-            writer.write(" " + respostaErrada1 + "\n");
-            writer.write(" " + respostaErrada2 + "\n");
-            writer.write(" " + respostaErrada3 + "\n");
-            writer.write(" " + respostaErrada4 + "\n");
+        try {
+            if (arq.createNewFile()) {
+                System.out.println("Arquivo criado com sucesso.");
+            }
 
-            writer.write("\n");
+            try (FileWriter questoesFile = new FileWriter(arq, StandardCharsets.UTF_8)) {
+                for (Questao questao : questoes) {
+                    questoesFile.write(questao.getEnunciado() + "|" +
+                            questao.getRespostaCorreta() + "|" +
+                            String.join("|", questao.getOutrasAlternativas()) +
+                            System.lineSeparator());
+                }
+            } catch (IOException e) {
+                System.out.println("Erro ao escrever no arquivo: " + e.getMessage());
+            }
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            ler.close();
+            System.out.println("Erro ao criar o arquivo: " + e.getMessage());
         }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader("Perguntas.txt"))) {
-            String linha;
-            while ((linha = reader.readLine()) != null) {
-                System.out.println(linha);
+        ArrayList<Questao> lista = new ArrayList<>();
+        File file = new File("Perguntas.txt");
+        List<String> listaTexto;
+        try {
+            listaTexto = Files.readAllLines(file.toPath(), Charset.defaultCharset());
+            for (String linha : listaTexto) {
+                String[] partes = linha.split("\\|");
+                if (partes.length >= 3) {
+                    String enunciado = partes[0];
+                    String respostaCorretaRead = partes[1];
+                    String[] alternativas = new String[partes.length - 2];
+                    System.arraycopy(partes, 2, alternativas, 0, alternativas.length);
+    
+                    Questao questao = new Questao(enunciado, respostaCorretaRead, alternativas);
+                    lista.add(questao);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         // Digite a pergunta
         // Digite a resposta correta
         // Digite 4 respostas erradas
